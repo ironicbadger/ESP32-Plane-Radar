@@ -101,6 +101,11 @@ WiFiManagerParameter s_param_weather(
     "show_weather", "Show current weather", "T", 2,
     s_weather_checkbox_attrs, WFM_LABEL_AFTER);
 
+char s_altitude_m_checkbox_attrs[32] = "type=\"checkbox\"";
+WiFiManagerParameter s_param_altitude_m(
+    "alt_m", "Aircraft altitude in metres", "T", 2,
+    s_altitude_m_checkbox_attrs, WFM_LABEL_AFTER);
+
 char s_fahrenheit_checkbox_attrs[32] = "type=\"checkbox\"";
 WiFiManagerParameter s_param_fahrenheit(
     "temp_f", "Temperature in Fahrenheit", "T", 2,
@@ -162,6 +167,10 @@ void refreshPortalParamDefaults() {
                        sizeof(s_weather_checkbox_attrs),
                        services::settings::weatherEnabled());
   s_param_weather.setValue("T", 2);
+  refreshCheckboxAttrs(s_altitude_m_checkbox_attrs,
+                       sizeof(s_altitude_m_checkbox_attrs),
+                       services::settings::altitudeMeters());
+  s_param_altitude_m.setValue("T", 2);
   refreshCheckboxAttrs(s_fahrenheit_checkbox_attrs,
                        sizeof(s_fahrenheit_checkbox_attrs),
                        services::settings::temperatureFahrenheit());
@@ -186,7 +195,8 @@ void onPortalParamsSaved() {
   ui::radar::saveRunwaysFromPortal(s_param_runways.getValue());
   services::settings::saveFromPortal(
       s_param_footer.getValue(), s_param_weather.getValue(),
-      s_param_fahrenheit.getValue(), s_param_clock24.getValue(),
+      s_param_fahrenheit.getValue(), s_param_altitude_m.getValue(),
+      s_param_clock24.getValue(),
       s_param_text_scale.getValue(),
       s_param_ota_password.getValue());
 }
@@ -199,6 +209,7 @@ void savePortalParamsFromRequest(WebServer& web) {
   const String footer = web.arg("show_footer");
   const String weather = web.arg("show_weather");
   const String fahrenheit = web.arg("temp_f");
+  const String altitude_m = web.arg("alt_m");
   const String clock24 = web.arg("clock_24");
   const String text_scale = web.arg("text_scale");
   const String ota_password = web.arg("ota_password");
@@ -210,8 +221,8 @@ void savePortalParamsFromRequest(WebServer& web) {
   ui::radar::saveMilesFromPortal(miles.c_str());
   ui::radar::saveRunwaysFromPortal(runways.c_str());
   services::settings::saveFromPortal(
-      footer.c_str(), weather.c_str(), fahrenheit.c_str(), clock24.c_str(),
-      text_scale.c_str(), ota_password.c_str());
+      footer.c_str(), weather.c_str(), fahrenheit.c_str(), altitude_m.c_str(),
+      clock24.c_str(), text_scale.c_str(), ota_password.c_str());
   refreshPortalParamDefaults();
 }
 
@@ -252,6 +263,7 @@ void attachPortalParams(WiFiManager& wm) {
   wm.addParameter(&s_param_lat);
   wm.addParameter(&s_param_lon);
   wm.addParameter(&s_param_miles);
+  wm.addParameter(&s_param_altitude_m);
   wm.addParameter(&s_param_runways);
   wm.addParameter(&s_param_footer);
   wm.addParameter(&s_param_weather);
