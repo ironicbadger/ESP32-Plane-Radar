@@ -198,8 +198,8 @@ void formatWeatherLine(char* out, size_t out_len) {
   if (settings::temperatureFahrenheit()) {
     temperature = temperature * 9.0f / 5.0f + 32.0f;
   }
-  snprintf(out, out_len, "%s %.0f%c RH%d%%", conditionLabel(s_weather_code),
-           lroundf(temperature), unit, s_humidity_percent);
+  snprintf(out, out_len, "%s %d%c RH%d%%", conditionLabel(s_weather_code),
+           static_cast<int>(lroundf(temperature)), unit, s_humidity_percent);
 }
 
 void formatDateTimeLine(char* out, size_t out_len) {
